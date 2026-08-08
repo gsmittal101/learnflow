@@ -2,7 +2,7 @@
 
 ## 1. User Stories
 
-**Registration**
+**Registration** User
 - As a new user, I want to register with my email and password, so that I can create a LearnFlow account.
 - As a new user, I want to receive validation errors for weak passwords or duplicate emails, so that I can correct my input before submitting.
 
