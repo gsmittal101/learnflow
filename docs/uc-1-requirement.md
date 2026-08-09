@@ -1,218 +1,468 @@
-# LearnFlow LMS — Registration & Login
+## 1 User Stories
 
-## 1. User Stories
+### US-01 · Registration
 
-**Registration** User
-- As a new user, I want to register with my email and password, so that I can create a LearnFlow account.
-- As a new user, I want to receive validation errors for weak passwords or duplicate emails, so that I can correct my input before submitting.
+**As a** new visitor,  
+**I want to** create a LearnFlow account by providing my full name, email, and a strong password,  
+**so that** I receive a personal, secured profile on the learning platform.
 
-**Login**
-- As a registered user, I want to log in with my email and password, so that I can access my LearnFlow account.
-- As a registered user, I want to receive a clear error when my credentials are invalid, so that I know to retry or reset my password.
+### US-02 · Email Verification
 
-**JWT Issuing**
-- As an authenticated user, I want the system to issue a JWT on successful login, so that I can access protected resources without re-authenticating on every request.
-- As an authenticated user, I want my JWT to expire after a set period, so that my session remains secure if my device is compromised.
+**As a** newly registered user,  
+**I want to** verify my email address through a confirmation link,  
+**so that** the platform can trust that my email is valid and I can receive future communications.
 
-**Password Reset**
-- As a user who forgot my password, I want to request a password reset link via email, so that I can regain access to my account.
-- As a user resetting my password, I want to set a new password using a valid reset token, so that I can log in again securely.
+### US-03 · Login
 
----
+**As a** registered user,  
+**I want to** log in with my email and password,  
+**so that** I can access my enrolled courses, progress data, and account settings.
 
-## 2. Acceptance Criteria (Given/When/Then)
+### US-04 · JWT Token Lifecycle
 
-**Registration**
-- Given a new user provides a unique email and a password meeting complexity rules, when they submit the registration form, then a new account is created and a confirmation response is returned.
-- Given a user provides an email already registered, when they submit the form, then the system rejects the request with a "duplicate email" error.
-- Given a user provides a password that fails complexity rules, when they submit the form, then the system rejects the request and specifies the rule violated.
+**As an** authenticated user,  
+**I want** the system to issue, refresh, and revoke JWT tokens transparently,  
+**so that** I stay securely signed in across sessions without repeatedly entering my credentials.
 
-**Login**
-- Given a registered user provides correct credentials, when they submit the login form, then the system authenticates them and returns a JWT.
-- Given a user provides an incorrect password, when they submit the login form, then the system returns an authentication error without indicating whether the email exists.
-- Given a user's account is locked or disabled, when they attempt to log in, then the system denies access with an appropriate message.
+### US-05 · Logout
 
-**JWT Issuing**
-- Given a successful login, when the JWT is generated, then it contains user ID, role, and expiration claims, signed with the server's secret key.
-- Given a JWT has expired, when the user makes an API request, then the system returns a 401 Unauthorized response.
-- Given a valid JWT, when the user accesses a protected endpoint, then the request is processed without requiring re-authentication.
+**As a** logged-in user,  
+**I want to** log out from my current session (or all sessions),  
+**so that** no one else can use my tokens if I walk away from a shared device.
 
-**Password Reset**
-- Given a user requests a password reset with a registered email, when they submit the request, then a time-limited reset token is emailed to them.
-- Given a user submits a valid, unexpired reset token with a new password, when they confirm the reset, then their password is updated and existing sessions/tokens are invalidated.
-- Given a user submits an expired or invalid reset token, when they attempt to reset, then the system rejects the request and prompts them to request a new link.
+### US-06 · Password Reset (Forgot Password)
 
----
+**As a** user who has forgotten my password,  
+**I want to** request a reset link via email and set a new password,  
+**so that** I can regain access to my account without contacting support.
 
-## 3. Business Requirements Document (BRD) — Summary
+----------
 
-**Project:** LearnFlow LMS — User Registration & Authentication Module
+## 2 Acceptance Criteria (Given / When / Then)
 
-**Objective:** Enable users to securely register, log in, and recover access to their LearnFlow accounts, supporting all downstream role-based access to the platform.
+### AC-01 · Registration — Happy Path
 
-**Scope:**
-- User registration with email/password
-- Login with credential validation
-- JWT-based session/token issuance
-- Self-service password reset via email
+#
 
-**Stakeholders:** LearnFlow product team, engineering (FastAPI backend, React 19 frontend), end users (students/instructors), security/compliance reviewers.
+Given
 
-**Functional Requirements:**
-- FR1: System shall validate email uniqueness and password strength at registration.
-- FR2: System shall authenticate users via email/password and issue a signed JWT on success.
-- FR3: JWTs shall carry an expiration claim and be validated on each protected API call.
-- FR4: System shall support password reset via a time-limited, single-use token sent by email.
+When
 
-**Non-Functional Requirements:**
-- Passwords stored using a strong hashing algorithm (e.g., bcrypt/argon2), never in plaintext.
-- JWT secret keys managed securely (environment variables/secrets manager), not hardcoded.
-- All auth endpoints served over HTTPS.
-- Rate limiting on login and password-reset endpoints to mitigate brute-force/abuse.
+Then
 
-**Assumptions:**
-- Postgres 17 stores user credentials and account metadata.
-- Email delivery service is available for reset links (not detailed in this brief).
+1
 
-**Out of Scope (this brief):** Role/permission management, SSO/OAuth, MFA — flagged as candidates for future iterations.# Welcome to StackEdit!
+A visitor is on the registration page
 
-Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about StackEdit, you can read me. If you want to play with Markdown, you can edit me. Once you have finished with me, you can create new files by opening the **file explorer** on the left corner of the navigation bar.
+They submit a valid full name, unique email, and a password that meets complexity rules (≥ 8 chars, upper + lower + digit + special)
 
+The system creates a user record with a **bcrypt/argon2-hashed** password, returns **201 Created**, and sends a verification email
 
-# Files
+2
 
-StackEdit stores your files in your browser, which means all your files are automatically saved locally and are accessible **offline!**
+A visitor submits an email that already exists
 
-## Create files and folders
+They press "Register"
 
-The file explorer is accessible using the button in left corner of the navigation bar. You can create a new file by clicking the **New file** button in the file explorer. You can also create folders by clicking the **New folder** button.
+The system returns **409 Conflict** with the message _"An account with this email already exists"_
 
-## Switch to another file
+3
 
-All your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.
+A visitor submits a password that fails complexity rules
 
-## Rename a file
+They press "Register"
 
-You can rename the current file by clicking the file name in the navigation bar or by clicking the **Rename** button in the file explorer.
+The system returns **400 Bad Request** with a list of all unmet password rules
 
-## Delete a file
+4
 
-You can delete the current file by clicking the **Remove** button in the file explorer. The file will be moved into the **Trash** folder and automatically deleted after 7 days of inactivity.
+A visitor omits any required field (name, email, password)
 
-## Export a file
+They press "Register"
 
-You can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.
+The system returns **422 Unprocessable Entity** identifying the missing field(s)
 
+### AC-02 · Email Verification
 
-# Synchronization
+#
 
-Synchronization is one of the biggest features of StackEdit. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.
+Given
 
-There are two types of synchronization and they can complement each other:
+When
 
-- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.
-	> To start syncing your workspace, just sign in with Google in the menu.
+Then
 
-- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.
-	> Before starting to sync files, you must link an account in the **Synchronize** sub-menu.
+1
 
-## Open a file
+A user has just registered and received a verification email
 
-You can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.
+They click the verification link within 24 hours
 
-## Save a file
+The system marks the account as **verified**, returns **200 OK**, and redirects to the login page
 
-You can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. StackEdit can sync one file with multiple locations and accounts.
+2
 
-## Synchronize a file
+A verification token has expired (> 24 h)
 
-Once your file is linked to a synchronized location, StackEdit will periodically synchronize it by downloading/uploading any modification. A merge will be performed if necessary and conflicts will be resolved.
+The user clicks the link
 
-If you just have modified your file and you want to force syncing, click the **Synchronize now** button in the navigation bar.
+The system returns **410 Gone** and prompts the user to request a new verification email
 
-> **Note:** The **Synchronize now** button is disabled if you have no file to synchronize.
+3
 
-## Manage file synchronization
+An unverified user attempts to log in
 
-Since one file can be synced with multiple locations, you can list and manage synchronized locations by clicking **File synchronization** in the **Synchronize** sub-menu. This allows you to list and remove synchronized locations that are linked to your file.
+They submit valid credentials
 
+The system returns **403 Forbidden** with the message _"Please verify your email before logging in"_ and offers a resend option
 
-# Publication
+### AC-03 · Login
 
-Publishing in StackEdit makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.
+#
 
-> Before starting to publish, you must link an account in the **Publish** sub-menu.
+Given   When  Then
 
-## Publish a File
+1
 
-You can publish your file by opening the **Publish** sub-menu and by clicking **Publish to**. For some locations, you can choose between the following formats:
+A verified user enters a correct email and password
 
-- Markdown: publish the Markdown text on a website that can interpret it (**GitHub** for instance),
-- HTML: publish the file converted to HTML via a Handlebars template (on a blog for example).
+They submit the login form
 
-## Update a publication
+The system returns **200 OK** with a JWT access token (in the response body) and a refresh token (in an **httpOnly** secure cookie)
 
-After publishing, StackEdit keeps your file linked to that publication which makes it easy for you to re-publish it. Once you have modified your file and you want to update your publication, click on the **Publish now** button in the navigation bar.
+2
 
-> **Note:** The **Publish now** button is disabled if your file has not been published yet.
+A user enters an incorrect password
 
-## Manage file publication
+They submit the login form
 
-Since one file can be published to multiple locations, you can list and manage publish locations by clicking **File publication** in the **Publish** sub-menu. This allows you to list and remove publication locations that are linked to your file.
+The system returns **401 Unauthorized** with a generic message _"Invalid email or password"_ (no account enumeration)
 
+3
 
-# Markdown extensions
+An unregistered email is submitted
 
-StackEdit extends the standard Markdown syntax by adding extra **Markdown extensions**, providing you with some nice features.
+The form is submitted
 
-> **ProTip:** You can disable any **Markdown extension** in the **File properties** dialog.
+The system returns the same **401** generic message (no account enumeration)
 
+4
 
-## SmartyPants
+A user fails login **5 times** within 15 minutes
 
-SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
+They attempt a 6th login
 
-|                |ASCII                          |HTML                         |
-|----------------|-------------------------------|-----------------------------|
-|Single backticks|`'Isn't this fun?'`            |'Isn't this fun?'            |
-|Quotes          |`"Isn't this fun?"`            |"Isn't this fun?"            |
-|Dashes          |`-- is en-dash, --- is em-dash`|-- is en-dash, --- is em-dash|
+The system returns **429 Too Many Requests**, locks the account for 15 minutes, and logs the event
 
+### AC-04 · JWT Token Lifecycle
 
-## KaTeX
+#
 
-You can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):
+Given  When   Then
 
-The *Gamma function* satisfying $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$ is via the Euler integral
+1
 
-$$
-\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
-$$
+A user has successfully logged in
 
-> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
+The backend authenticates them
 
+It issues a signed **access token** (expiry: 15 min) and a signed **refresh token** (expiry: 7 days), both containing the user's `sub` (user ID) and `role` claims
 
-## UML diagrams
+2
 
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
+An access token has expired
 
-```mermaid
-sequenceDiagram
-Alice ->> Bob: Hello Bob, how are you?
-Bob-->>John: How about you John?
-Bob--x Alice: I am good thanks!
-Bob-x John: I am good thanks!
-Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
+The client sends a valid, non-revoked refresh token to `POST /auth/refresh`
 
-Bob-->Alice: Checking with John...
-Alice->John: Yes... John, how are you?
+The system issues a new access token (and optionally rotates the refresh token), returning **200 OK**
+
+3
+
+A refresh token is expired, revoked, or malformed
+
+The client sends it to the refresh endpoint
+
+The system returns **401 Unauthorized** and the client must redirect the user to the login page
+
+4
+
+A request is made to any protected endpoint
+
+The access token is missing or invalid
+
+The system returns **401 Unauthorized**
+
+### AC-05 · Logout
+
+#
+
+Given  When  Then
+
+1
+
+A logged-in user triggers logout
+
+They call `POST /auth/logout`
+
+The system adds the refresh token to a server-side **blocklist** (PostgreSQL table or Redis), clears the httpOnly cookie, and returns **200 OK**
+
+2
+
+A user triggers "Log out all sessions"
+
+They call `POST /auth/logout-all`
+
+The system revokes **all** refresh tokens for that user ID and returns **200 OK**
+
+### AC-06 · Password Reset
+
+#
+
+Given  When  Then
+
+1
+
+A user requests a reset for a registered email
+
+They submit the forgot-password form
+
+The system generates a single-use, time-limited token (expiry: 1 hour), stores its hash, sends a reset link to the email, and returns **200 OK** with a generic message _"If that email exists, a reset link has been sent"_
+
+2
+
+A user requests a reset for an **unregistered** email
+
+They submit the form
+
+The system returns the **same 200 OK** generic message (no account enumeration) without sending any email
+
+3
+
+A user clicks a valid, unexpired reset link
+
+They submit a new password that meets complexity rules
+
+The system hashes and stores the new password, invalidates the reset token, revokes all existing refresh tokens for the user, and returns **200 OK**
+
+4
+
+A reset token is expired or already used
+
+The user tries to submit a new password
+
+The system returns **410 Gone** with the message _"This reset link has expired. Please request a new one"_
+
+5
+
+A user submits a new password that fails complexity rules
+
+They click "Reset Password"
+
+The system returns **400 Bad Request** listing the unmet rules
+
+----------
+
+## 3 Business Requirements Document (BRD) — Summary
+
+### 3.1 Purpose
+
+Provide secure, standards-compliant authentication for the LearnFlow Learning Management System so that learners, instructors, and administrators can register, access, and manage their accounts with confidence.
+
+### 3.2 Scope
+
+In Scope
+
+Out of Scope (Future Phases)
+
+Self-service registration with email + password
+
+Social / OAuth login (Google, GitHub)
+
+Email verification flow
+
+Multi-factor authentication (TOTP / SMS)
+
+Credential-based login
+
+Role-based access control (RBAC) beyond basic `role` claim
+
+JWT access + refresh token lifecycle
+
+Single Sign-On (SSO / SAML)
+
+Secure logout (single + all sessions)
+
+Biometric authentication
+
+Forgot-password / reset-password flow
+
+Admin-initiated password reset
+
+### 3.3 Technical Constraints & Decisions
+
+Area
+
+Decision
+
+**Password hashing** 
+
+bcrypt (cost factor 12) or argon2id; plaintext storage is a zero-tolerance violation
+
+**Access token**
+
+Signed JWT (HS256 or RS256), 15-minute expiry, carried in `Authorization: Bearer` header
+
+**Refresh token**
+
+Opaque or signed JWT, 7-day expiry, stored in an **httpOnly, Secure, SameSite=Strict** cookie
+
+**Token revocation**
+
+Refresh tokens tracked in a `refresh_tokens` PostgreSQL table (or Redis set) with a revoked/used flag
+
+**Rate limiting**
+
+5 failed logins per 15 min per email; 3 reset requests per hour per email — enforced at the FastAPI middleware or reverse-proxy layer
+
+**Account enumeration prevention**
+
+Login and reset endpoints always return generic messages regardless of email existence
+
+**Email delivery**
+
+Delegated to a transactional email provider (e.g., AWS SES, Resend, SendGrid); the system must not block on send
+
+**Frontend token handling**
+
+React 19 stores the access token in memory (not localStorage); refresh handled via silent cookie-based call to `/auth/refresh`
+
+### 3.4 Data Model (Key Entities)
+
 ```
+users
+├── id              UUID  PK
+├── full_name       VARCHAR(120)  NOT NULL
+├── email           VARCHAR(255)  UNIQUE NOT NULL
+├── password_hash   VARCHAR(255)  NOT NULL
+├── is_verified     BOOLEAN       DEFAULT FALSE
+├── is_active       BOOLEAN       DEFAULT TRUE
+├── created_at      TIMESTAMPTZ
+└── updated_at      TIMESTAMPTZ
 
-And this will produce a flow chart:
+refresh_tokens
+├── id              UUID  PK
+├── user_id         UUID  FK → users.id
+├── token_hash      VARCHAR(255)  NOT NULL
+├── expires_at      TIMESTAMPTZ   NOT NULL
+├── is_revoked      BOOLEAN       DEFAULT FALSE
+└── created_at      TIMESTAMPTZ
 
-```mermaid
-graph LR
-A[Square Rect] -- Link text --> B((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
+password_reset_tokens
+├── id              UUID  PK
+├── user_id         UUID  FK → users.id
+├── token_hash      VARCHAR(255)  NOT NULL
+├── expires_at      TIMESTAMPTZ   NOT NULL
+├── is_used         BOOLEAN       DEFAULT FALSE
+└── created_at      TIMESTAMPTZ
+```
+3.5 API Endpoint Summary
+Method	Route							Purpose									Auth Required
+POST	/auth/register					Create new account						No
+GET		/auth/verify-email?token=		Confirm email address					No
+POST	/auth/resend-verification		Resend verification email				No
+POST	/auth/login						Authenticate and issue tokens			No
+POST	/auth/refresh					Rotate access token						Refresh	cookie
+POST	/auth/logout					Revoke current refresh token			Yes
+POST	/auth/logout-all				Revoke all user sessions				Yes
+POST	/auth/forgot-password			Send password reset email				No
+POST	/auth/reset-password			Set new password with token				No (token-validated)
+
+### 3.6 Non-Functional Requirements
+
+Category
+
+Requirement
+
+**Security**
+
+OWASP Top-10 compliance; all secrets in env vars, never committed; HTTPS enforced; CORS restricted to the React frontend origin
+
+**Performance**
+
+Login and registration endpoints respond within 500 ms at p95 under normal load
+
+**Availability**
+
+Auth service uptime target of 99.9 %
+
+**Logging & Audit**
+
+Every login attempt (success/failure), token issuance, revocation, and password reset event is logged with timestamp, IP, and user-agent (PII-safe)
+
+**Data Privacy**
+
+Passwords never logged or returned in API responses; reset tokens are single-use and hashed at rest
+
+### 3.7 Success Metrics
+
+Metric
+
+Target
+
+Registration-to-verified conversion rate
+
+≥ 80 % within 24 h
+
+Login failure rate (credential errors)
+
+< 5 % of all attempts
+
+Password reset link redemption rate
+
+≥ 70 % of requests
+
+Median login latency (p50)
+
+< 300 ms
+
+Plaintext password exposure incidents
+
+**Zero**
+
+### 3.8 Key Risks & Mitigations
+
+Risk
+
+Impact
+
+Mitigation
+
+Refresh token theft (XSS)
+
+Session hijack
+
+httpOnly + Secure + SameSite=Strict cookie; CSP headers; no localStorage for tokens
+
+Brute-force attacks
+
+Account compromise
+
+Rate-limiting at middleware + reverse proxy; account lockout after 5 failures
+
+Email provider outage
+
+Users cannot verify/reset
+
+Queue-based email dispatch with retry; fallback provider
+
+JWT secret leak
+
+All tokens forgeable
+
+Secret rotated via env/vault; RS256 key pair preferred for production
+
+Account enumeration
+
+Privacy leakage / phishing prep
+
+Generic responses on login failure and reset request
