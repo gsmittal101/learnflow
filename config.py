@@ -3,7 +3,7 @@
 Teaching point: nothing in this repository contains a key or a password. Every
 one of them is read here, and a missing one stops the script and names the
 variable, rather than producing a stack trace two hundred lines later in
-somebody else's library.
+somebody else's library. Adding some more.
 """
 
 import os
