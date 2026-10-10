@@ -8,7 +8,7 @@ between an agent and a script.
 `root_agent` at the bottom is the name ADK's command line looks for, so this
 same file answers both:
 
-    adk run order_agent          (from src/session_02)
+    adk run adk_demo_1          (from src/session_02)
     python 01_first_agent.py
 """
 
@@ -56,7 +56,7 @@ def build_agent(
     instruction  the standing instruction, sent on EVERY call
     tools        plain Python functions, passed by reference, not registered
     generate_content_config
-                 the sampling knobs (demo 4 turns temperature up and down)
+                 the sampling knobs (adk_demo_1 4 turns temperature up and down)
     """
     return Agent(
         name="order_support_agent",

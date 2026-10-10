@@ -43,7 +43,7 @@ async def ask(agent, question: str, show_events: bool = True) -> Turn:
     """Send one question. Return what came back and what happened on the way.
 
     A fresh session every time, on purpose: these demos must not inherit
-    history from the previous run, or the temperature demo measures the wrong
+    history from the previous run, or the temperature adk_demo_1 measures the wrong
     thing entirely.
     """
     runner = InMemoryRunner(agent=agent, app_name=APP_NAME)
@@ -84,7 +84,7 @@ async def ask(agent, question: str, show_events: bool = True) -> Turn:
                         label = "AGENT" if event.is_final_response() else f"({event.author})"
                         print(f"  {label} > {turn.text}")
     except genai_errors.APIError as error:
-        # ONLY the API's own errors are caught here. A TypeError in the demo
+        # ONLY the API's own errors are caught here. A TypeError in the adk_demo_1
         # code still explodes with a full traceback, because that one is a real
         # bug and hiding it would be worse.
         if SHOW_TRACEBACKS:
@@ -117,7 +117,7 @@ _LIKELY_CAUSES = {
     403: ["The key is not permitted to use this model, or billing is not on."],
     429: [
         "Rate limit or quota. Wait a moment and re-run, or use a project with",
-        "quota. Free-tier keys trip this quickly when a demo loops.",
+        "quota. Free-tier keys trip this quickly when a adk_demo_1 loops.",
     ],
     500: ["The provider had a server error. Re-run it once before doing anything else."],
     503: ["The model is overloaded at the provider's end. Re-run, or fall back."],
@@ -128,12 +128,12 @@ def _explain_api_error(error: genai_errors.APIError) -> None:
     """Six lines instead of three hundred.
 
     Same standard as uc1_service.py: a stack trace in front of a room teaches
-    "the demo is broken", which is never the lesson. The API's own message is
+    "the adk_demo_1 is broken", which is never the lesson. The API's own message is
     printed verbatim -- we explain it, we never replace it.
     """
     code = getattr(error, "code", None)
     print("\n" + "=" * 72)
-    print("THE MODEL CALL FAILED. This is the API refusing, not a bug in the demo.")
+    print("THE MODEL CALL FAILED. This is the API refusing, not a bug in the adk_demo_1.")
     print("=" * 72)
     print(f"  model    {config.model_label()}")
     print(f"  status   {code} {getattr(error, 'status', '') or ''}".rstrip())

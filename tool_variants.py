@@ -1,6 +1,6 @@
 """Two tools, and two sets of words describing them. The code never changes.
 
-This is the whole of demo 6. Below are two real Python functions. Their bodies
+This is the whole of adk_demo_1 6. Below are two real Python functions. Their bodies
 are written once and are never touched again. What the flag switches is their
 DOCSTRINGS -- the English the model reads -- by assigning to __doc__ before the
 agent is built.
@@ -70,7 +70,7 @@ def get_return_status(return_id: str) -> dict:
 # that were true once and were never updated after somebody repurposed the
 # functions. Every line below is a sentence a real team has shipped.
 #
-# Two independent traps, so the demo fails on one or the other:
+# Two independent traps, so the adk_demo_1 fails on one or the other:
 #
 #   1. get_order_status now describes itself as internal stock control and
 #      explicitly warns the model off customer questions, while

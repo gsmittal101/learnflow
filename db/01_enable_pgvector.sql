@@ -5,5 +5,5 @@
 -- "CREATE EXTENSION" in front of a live room.
 CREATE EXTENSION IF NOT EXISTS vector;
 
--- Proof for the demo: `docker compose exec postgres psql -U agentic -d agentic
+-- Proof for the adk_demo_1: `docker compose exec postgres psql -U agentic -d agentic
 -- -c "SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';"`

@@ -12,7 +12,7 @@
 services:
   postgres:
     # Postgres 18 with pgvector already compiled in, pinned to an exact tag.
-    # "latest" is how a demo that worked in rehearsal breaks on the night.
+    # "latest" is how a adk_demo_1 that worked in rehearsal breaks on the night.
     image: pgvector/pgvector:0.8.6-pg18
     container_name: session02_postgres
     environment:

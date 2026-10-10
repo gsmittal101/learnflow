@@ -16,7 +16,7 @@ dependencies = [
     "google-adk==2.6.3",
     # Arrives transitively with google-adk, and is declared anyway: we import
     # google.genai.types directly (GenerateContentConfig, for temperature), and
-    # a demo should not depend on somebody else's transitive dependency.
+    # a adk_demo_1 should not depend on somebody else's transitive dependency.
     "google-genai==2.17.0",
     "python-dotenv==1.2.2",
 ]
@@ -29,7 +29,7 @@ dev = [
 ]
 # The stated fallback for the night the model API is down: run the same agent
 # against a local Ollama model. ADK reaches Ollama through LiteLLM, which is a
-# large dependency and is NOT part of the two-minute clean-clone demo -- install
+# large dependency and is NOT part of the two-minute clean-clone adk_demo_1 -- install
 # it only if you want the fallback ready:  uv sync --extra ollama
 #
 # This is the one dependency here that is a range rather than an exact pin, and
@@ -44,7 +44,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-# The demo scripts are numbered (00_, 01_, ...) so the running order is the
+# The adk_demo_1 scripts are numbered (00_, 01_, ...) so the running order is the
 # directory listing. Numbers make them non-importable, which is correct: they
 # are run, never imported. The shared modules beside them are importable and
 # unnumbered. Nothing here is a distributable package.
