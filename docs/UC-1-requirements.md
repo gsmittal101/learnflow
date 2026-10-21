@@ -1,4 +1,5 @@
 # LearnFlow LSM — Authentication Module
+#change
 
 > **Module:** User Authentication  
 > **Stack:** FastAPI · React 19 · PostgreSQL 17 · JWT  
