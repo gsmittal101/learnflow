@@ -1,6 +1,6 @@
 LearnFlow LSM: User Registration & Authentication
 Brief: "Let users register and log into LearnFlow." Scope: Registration, login, JWT issuing, password reset Stack context: FastAPI (API), React 19 (UI), PostgreSQL 17 (persistence), JWT (session/auth tokens)
-1. User Stories
+1. User Stories 
 US-01: Registration
 As a new learner, I want to create an account with my email and a password, so that I can access LearnFlow and have my progress saved.
 US-02: Email Verification
